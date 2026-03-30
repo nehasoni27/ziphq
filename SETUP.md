@@ -40,7 +40,30 @@
 
 ---
 
-## Branch protection on `master`
+## Make merge rules + protection mandatory (script)
+
+GitHub does **not** read merge-button or branch-protection settings from files in the repo. To apply them **without clicking through every setting**, run the included script once you have pushed code and **CI has completed at least once** (so the **`CI`** check exists).
+
+**Requirements:** [GitHub CLI](https://cli.github.com/) (`gh`), logged in with permission to change repo settings (`gh auth login`).
+
+```bash
+cd /path/to/zip_neha
+chmod +x scripts/configure-github-repo.sh
+./scripts/configure-github-repo.sh nehasoni27/ziphq master
+```
+
+The script:
+
+1. **Disables merge commits** and **allows squash and rebase** merges only (no “Create a merge commit” button).
+2. Protects **`master`**: **1** approving review, **required `CI` check** (strict / up to date), **linear history**, admins follow the same rules.
+
+Use another repo or branch: `./scripts/configure-github-repo.sh OWNER/REPO branch-name`.
+
+If branch protection returns **422**, wait until a workflow run has published the **`CI`** check, then run the script again. If the check name differs, edit the `"context": "CI"` value in [`scripts/configure-github-repo.sh`](scripts/configure-github-repo.sh) to match **Settings → Branches → required status checks** (or the name shown on a green PR check).
+
+---
+
+## Branch protection on `master` (manual)
 
 Configure in the repository: **Settings** → **Branches** → **Add branch protection rule** (or **Edit** if one exists) for branch name pattern `master`.
 
